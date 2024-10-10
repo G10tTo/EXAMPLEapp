@@ -6,7 +6,7 @@ create table badges_list(
     title VARCHAR(100) UNIQUE NOT NULL CHECK (char_length(title) <= 100),
     description TEXT NOT NULL CHECK (char_length(description) >= 3 AND char_length(description) <= 300),
     points INT CHECK (points >= 0 AND points <= 100) DEFAULT 0,
-    modified_date TIMESTAMP
+    modified_date TIMESTAMPTZ DEFAULT NULL -- Timestamp with timezone and default to NULL
 );
 
 -- Sample insert without modified date

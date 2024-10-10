@@ -102,41 +102,38 @@ app.post('/badges', async (req, res) => {
     const title = rawTitle.replace(/\s+/g, ' ').trim();
     console.log('Received points:', points);
 
-    // Validate points only if provided
-    if (points !== undefined) {
-      if (typeof points !== 'number' || points < 0 || points > 100) {
-        return res.status(400).json({ error: 'Points must be a number between 0 and 100.' });
-      }
+    if (points !== undefined && (typeof points !== 'number' || points < 0 || points > 100)) {
+      return res.status(400).json({ error: 'Points must be a number between 0 and 100.' });
     }
 
-    // Validation for title and description
     if (!title || title.length > 100) {
-      return res.status(400).json({ error: 'Title is required and must be 1-100 characters long.' });
+      return res.status(400).json({ error: 'Title must be 1-100 characters long.' });
     }
+
     if (!description || description.length < 3 || description.length > 300) {
       return res.status(400).json({ error: 'Description must be between 3 and 300 characters long.' });
     }
 
-    // Check if a badge with the same title already exists (case-insensitive)
-    const existingBadge = await pool.query('SELECT * FROM badges_list WHERE LOWER(title) = LOWER($1)', [title]);
+    const existingBadge = await pool.query(
+      'SELECT * FROM badges_list WHERE LOWER(title) = LOWER($1)', [title]
+    );
     if (existingBadge.rows.length > 0) {
       return res.status(409).json({ error: 'Title already exists.' });
     }
 
-    // Set points to 0 if not provided
     const badgePoints = points !== undefined ? points : 0;
-
     const newBadge = await pool.query(
-      `INSERT INTO badges_list (title, description, points) VALUES($1, $2, $3) RETURNING *`,
+      'INSERT INTO badges_list (title, description, points) VALUES($1, $2, $3) RETURNING *',
       [title, description, badgePoints]
     );
     res.json(newBadge.rows[0]);
 
   } catch (err) {
-    console.log('Internal error:', err);
-    res.status(500).send('Internal error:'+ err);
+    console.error('Internal error:', err);
+    res.status(500).send('Internal error:' + err);
   }
 });
+
 
 app.listen(PORT,() => {
   console.log(`Server listening on the port  ${PORT}`);

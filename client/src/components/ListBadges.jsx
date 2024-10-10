@@ -74,7 +74,7 @@ function ListBadges() {
     {
       title: (
         <>
-          Last Modified{' '}
+          Modification Date{' '}
           <Button onClick={toggleSortOrder} type="link">
             {sortOrder === 'default' && '↕'}
             {sortOrder === 'asc' && '↓'}
@@ -84,7 +84,7 @@ function ListBadges() {
       ),
       dataIndex: 'modified_date',
       key: 'modified_date',
-      render: (text) => (text ? new Date(text).toLocaleString() : '-'),
+      render: (text) => (text ? new Date(text).toLocaleString() : '-'), // Converts UTC time to local timezone
     },
     {
       title: 'Actions',
