@@ -54,7 +54,7 @@ function ListBadges() {
       key: 'description',
     },
     {
-      title: 'Last Modified',
+      title: 'Modification Date',
       dataIndex: 'modified_date',
       key: 'modified_date',
       render: (text) => text ? new Date(text).toLocaleString() : '-',
