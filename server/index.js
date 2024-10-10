@@ -74,8 +74,7 @@ app.put('/badges/:id', async (req, res) => {
       return res.status(409).json({ error: 'Title already exists.' });
     }
 
-    // Create the update query
-    let query = 'UPDATE badges_list SET title=$2, description=$3';
+    let query = 'UPDATE badges_list SET title=$2, description=$3, modified_date=NOW()';
     const values = [id, title, description];
 
     // If points is provided, add it to the update query
@@ -88,13 +87,14 @@ app.put('/badges/:id', async (req, res) => {
     query += ' WHERE id=$1 RETURNING *';
 
     // Update badge in the database
-    const badge = await pool.query(query, values);  
+    const badge = await pool.query(query, values);
     res.json(badge.rows[0]);
-  }catch (err) {
+  } catch (err) {
     console.log('Internal error:', err);
     res.status(500).send('Internal error:'+ err);
   }
 });
+
 
 app.post('/badges', async (req, res) => {
   try {
