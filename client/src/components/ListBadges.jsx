@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Button, Popconfirm, message } from 'antd';
 import { EditBadgeForm } from './EditBadgeForm';
- 
+
 function ListBadges() {
   const [badges, setBadges] = useState([]);
+  const [sortOrder, setSortOrder] = useState('default'); // default, asc, desc
 
   const deleteBadge = async id => {
     try {
@@ -22,9 +23,8 @@ function ListBadges() {
     }
   };
 
- const getBadges = async () => {
- 
-  try {
+  const getBadges = async () => {
+    try {
       const response = await fetch(`${process.env.REACT_APP_URL}/badges`);
 
       if (response.ok) {
@@ -36,11 +36,29 @@ function ListBadges() {
     } catch (err) {
       message.error('A server error occurred');
     }
-};
+  };
 
   useEffect(() => {
     getBadges();
   }, []);
+
+  const toggleSortOrder = () => {
+    setSortOrder((prevOrder) => {
+      if (prevOrder === 'default') return 'asc'; // Ascending (Oldest)
+      if (prevOrder === 'asc') return 'desc';   // Descending (Most Recent)
+      return 'default';                         // Back to default
+    });
+  };
+
+  // Sort the badges based on sortOrder
+  const sortedBadges = [...badges].sort((a, b) => {
+    if (sortOrder === 'default') return 0;
+    const dateA = new Date(a.modified_date || 0);
+    const dateB = new Date(b.modified_date || 0);
+    if (sortOrder === 'asc') return dateA - dateB; // Oldest first
+    if (sortOrder === 'desc') return dateB - dateA; // Most recent first
+    return 0;
+  });
 
   const columns = [
     {
@@ -54,10 +72,19 @@ function ListBadges() {
       key: 'description',
     },
     {
-      title: 'Modification Date',
+      title: (
+        <>
+          Modification Date{' '}
+          <Button onClick={toggleSortOrder} type="link">
+            {sortOrder === 'default' && '↕'}
+            {sortOrder === 'asc' && '↓'}
+            {sortOrder === 'desc' && '↑'}
+          </Button>
+        </>
+      ),
       dataIndex: 'modified_date',
       key: 'modified_date',
-      render: (text) => text ? new Date(text).toLocaleString() : '-',
+      render: (text) => (text ? new Date(text).toLocaleString() : '-'), // Converts UTC time to local timezone
     },
     {
       title: 'Actions',
@@ -79,14 +106,13 @@ function ListBadges() {
       ),
     },
   ];
-  
 
   return (
     <>
       <h5 style={{ textAlign: 'center', marginTop: '2rem' }}>Badges List</h5>
       <Table
         columns={columns}
-        dataSource={badges}
+        dataSource={sortedBadges}
         rowKey="id"
         pagination={{ pageSize: 10 }}
       />
