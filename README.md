@@ -42,8 +42,6 @@
 ## Testing
 Here's a detailed set of tests to validate the **modified_date** feature:
 
-## Testing
-
 ### Database testing
 To ensure the database structure and functionality for the `modified_date` are working correctly, use the following queries:
 
@@ -108,8 +106,6 @@ http PUT http://localhost:5000/badges/1 Content-Type:application/json title="Upd
 #### GET Method Test (Sort by Modified Date)
 Test the sorting functionality by retrieving badges in ascending and descending order:
 ```bash
-http GET http://localhost:5000/badges?sort=asc  # Sort badges by oldest modification date
-http GET http://localhost:5000/badges?sort=desc # Sort badges by most recent modification date
+http GET http://localhost:5000/badges\?sort=asc  # Sort badges by oldest modification date
+http GET http://localhost:5000/badges\?sort=desc # Sort badges by most recent modification date
 ```
-
-These tests should cover the key aspects of the **modified_date** feature, ensuring correct behavior when creating, updating, and sorting badges.
